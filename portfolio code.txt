@@ -1,0 +1,18 @@
+portfolio code:
+
+education:
+  heading: "Education"
+  items:
+    - title: "Bachelor's in Applied Computer Science"
+      description: "Focused on software development, web technologies, and database management."
+      datetime: "2024 – heden"
+    - title: "Bachelor's in Applied Computer Science"
+      description: "Focused on software development, web technologies, and database management."
+      datetime: "2022 – 2024"
+
+experience:
+  heading: "Experience"
+  items:
+    - title: "Full Stack Developer"
+      description: "Built and maintained web applications using modern frameworks and tools."
+      datetime: "2024"

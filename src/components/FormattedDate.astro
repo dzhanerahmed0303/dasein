@@ -1,17 +1,18 @@
 ---
-interface Props {
-	date: Date;
-}
+const { date, pubDate, updatedDate } = Astro.props;
 
-const { date } = Astro.props;
+const raw = date ?? pubDate ?? updatedDate;
+const d = raw ? new Date(raw) : null;
 ---
 
-<time datetime={date.toISOString()}>
-	{
-		date.toLocaleDateString('en-us', {
-			year: 'numeric',
-			month: 'short',
-			day: 'numeric',
-		})
-	}
-</time>
+{d ? (
+  <time datetime={d.toISOString()}>
+    {d.toLocaleDateString('en-us', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    })}
+  </time>
+) : (
+  <time>Unknown date</time>
+)}

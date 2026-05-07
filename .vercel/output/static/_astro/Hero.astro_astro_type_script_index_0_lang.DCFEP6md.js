@@ -1,0 +1,1 @@
+import{g as t}from"./index.xgxdCp6f.js";const o=t.timeline({defaults:{ease:"power3.out"},delay:.7});o.from(".hero-letters",{opacity:0,y:60,duration:.9}).from("section img",{opacity:0,x:40,duration:.7},"-=0.5").from("section .max-w-360 > div > div",{opacity:0,y:20,duration:.6,stagger:.1},"-=0.3");

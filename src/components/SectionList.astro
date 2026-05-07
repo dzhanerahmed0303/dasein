@@ -53,10 +53,10 @@ function isExternal(href: string) {
                 </h2>
             </div>
 
-            <div class="flex flex-col gap-12 lg:col-span-2">
+            <div class="flex flex-col gap-6 md:gap-10 lg:gap-12 lg:col-span-2">
                 {
-                    items.map((item) => (
-                        <article class="group relative grid grid-cols-1 gap-4 lg:grid-cols-3 lg:items-start">
+                    items.map((item, i) => (
+                        <article data-reveal style={`transition-delay:${i * 80}ms`} class="group relative grid grid-cols-1 gap-4 lg:grid-cols-3 lg:items-start">
                             <div class="lg:col-span-2">
                                 <h3 class="text-sm 2xl:text-xl text-base-900 font-bold uppercase">
                                     {item.href ? (

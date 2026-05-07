@@ -14,17 +14,27 @@ interface Props {
 }
 
 import { withBase } from "../utils/slugify";
+import { Image } from "astro:assets";
+import profilePhoto from "../assets/Dzhaner.png";
 
 const isExternal = (path: string) => /^[a-z][a-z0-9+.-]*:/i.test(path) || path.startsWith('//');
 
-const { title, description, actions = [], role, location } = Astro.props as Props; 
+const { title, description, actions = [], role, location } = Astro.props as Props;
 ---
 
 <section class="flex flex-col justify-between" style="min-height: calc(100vh - (var(--grid-cell) / 2));">
   <div class="grid gap-3 md:gap-4 max-w-3xl pb-6 md:pb-10">
-    <div class="flex flex-col lg:flex-row lg:justify-between items-start gap-8">
+    <div class="flex flex-col lg:flex-row lg:justify-between lg:items-end gap-4 lg:gap-8">
+      <Image
+        src={profilePhoto}
+        alt={title}
+        width={520}
+        height={640}
+        quality={100}
+        class="order-1 lg:order-2 rounded-2xl object-cover object-top w-full h-52 sm:h-64 lg:w-52 lg:h-64 shrink-0"
+      />
       <div
-        class="hero-letters text-[10vw] md:text-[10rem] lg:text-[10rem] leading-[0.85] font-extrabold text-base-900 uppercase"
+        class="order-2 lg:order-1 hero-letters text-[13vw] md:text-[10rem] lg:text-[10rem] leading-[0.85] font-extrabold text-base-900 uppercase"
         aria-hidden="true"
       >
         {title}
@@ -49,7 +59,7 @@ const { title, description, actions = [], role, location } = Astro.props as Prop
             {actions.map((action) => (
               isExternal(action.href) ? (
                 <a
-                  class="text-xs 2xl:text-lg text-base-900 hover:text-base-500 font-bold uppercase inline-block px-4 py-2"
+                  class="hero-action text-xs 2xl:text-lg text-base-900 font-bold uppercase inline-block px-4 py-2"
                   href={action.href}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -58,7 +68,7 @@ const { title, description, actions = [], role, location } = Astro.props as Prop
                 </a>
               ) : (
                 <a
-                  class="text-xs 2xl:text-lg text-base-900 hover:text-base-500 font-bold uppercase inline-block px-4 py-2"
+                  class="hero-action text-xs 2xl:text-lg text-base-900 font-bold uppercase inline-block px-4 py-2"
                   href={withBase(action.href)}
                 >
                   {action.label}
@@ -71,3 +81,13 @@ const { title, description, actions = [], role, location } = Astro.props as Prop
     </div>
   </div>
 </section>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const tl = gsap.timeline({ defaults: { ease: 'power3.out' }, delay: 0.7 });
+
+  tl.from('.hero-letters', { opacity: 0, y: 60, duration: 0.9 })
+    .from('section img', { opacity: 0, x: 40, duration: 0.7 }, '-=0.5')
+    .from('section .max-w-360 > div > div', { opacity: 0, y: 20, duration: 0.6, stagger: 0.1 }, '-=0.3');
+</script>

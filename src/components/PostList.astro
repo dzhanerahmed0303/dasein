@@ -76,7 +76,9 @@ const visiblePosts = typeof limit === "number" ? posts.slice(0, limit) : posts;
             <div
                 class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-y-20 gap-x-8"
             >
-                {
+                {visiblePosts.length === 0 ? (
+                    <p class="text-muted col-span-2 py-4">Nog geen blogs toegevoegd.</p>
+                ) : (
                     visiblePosts.map((post) => {
                         const p = getPostData(post) || {};
                         const id = (post as any).id;
@@ -93,23 +95,19 @@ const visiblePosts = typeof limit === "number" ? posts.slice(0, limit) : posts;
                             : null;
 
                         return (
-                            <Card
-                                title={p.title}
-                                href={href}
-                                image={p.heroImage}
-                                imageAlt={p.title}
-                                description={p.description}
-                                date={pubDate}
-                                variant="post"
-                            />
+                            <div data-reveal style={`transition-delay:${visiblePosts.indexOf(post) * 100}ms`}>
+                                <Card
+                                    title={p.title}
+                                    href={href}
+                                    image={p.heroImage}
+                                    imageAlt={p.title}
+                                    description={p.description}
+                                    date={pubDate}
+                                />
+                            </div>
                         );
                     })
-                }
-                <Card
-                    title={viewAllLabel}
-                    href={withBase(viewAllHref ?? '/blog/')}
-                    variant="post"
-                />
+                )}
             </div>
         </div>
     </div>

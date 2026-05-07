@@ -18,13 +18,49 @@ const { title = site.author.name, description, image } = Astro.props;
 <!doctype html>
 <html lang="en">
     <head>
-        <BaseHead title={title} description={description} image={image} />
+        <BaseHead title={title ?? ''} description={description ?? ''} image={image} />
     </head>
     <body>
-        <Header />
-        <main class="content-shell">
-            <slot />
-        </main>
-        <Footer />
+        <div id="page-curtain" aria-hidden="true" style="position:fixed;inset:0;z-index:9998;background:#0d0d10;pointer-events:none;will-change:transform;"></div>
+        <div class="blob-container" aria-hidden="true">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+            <div class="blob blob-3"></div>
+        </div>
+        <div style="position: relative; z-index: 1; display: contents;">
+            <Header />
+            <main class="content-shell">
+                <slot />
+            </main>
+            <Footer />
+        </div>
     </body>
 </html>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const curtain = document.getElementById('page-curtain');
+  if (curtain) {
+    gsap.to(curtain, {
+      yPercent: -100,
+      duration: 0.85,
+      ease: 'expo.inOut',
+      onComplete: () => curtain.remove(),
+    });
+    setTimeout(() => curtain.remove(), 2000);
+  }
+</script>
+
+<script is:inline>
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('revealed');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('[data-reveal]').forEach((el) => revealObserver.observe(el));
+</script>

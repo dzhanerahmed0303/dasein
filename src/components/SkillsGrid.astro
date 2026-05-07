@@ -1,0 +1,146 @@
+---
+import { Icon } from 'astro-icon/components';
+
+interface Item {
+  title: string;
+  description?: string;
+}
+
+interface Props {
+  heading: string;
+  items: Item[];
+}
+
+const { heading, items } = Astro.props;
+
+const iconMap: Record<string, string> = {
+  'javascript':   'devicon:javascript',
+  'typescript':   'devicon:typescript',
+  'java':         'devicon:java',
+  'c#':           'devicon:csharp',
+  'html':         'devicon:html5',
+  'css':          'devicon:css3',
+  'tailwind':     'devicon:tailwindcss',
+  'react':        'devicon:react',
+  'react native': 'devicon:react',
+  'astro':        'devicon:astro',
+  'leaflet':      'tabler:map-2',
+  'node.js':      'devicon:nodejs',
+  'express':      'devicon:express',
+  'mongodb':      'devicon:mongodb',
+  'sql':          'devicon:mysql',
+  'git':          'devicon:git',
+  'github':       'devicon:github',
+  'docker':       'devicon:docker',
+  'vs code':      'devicon:vscode',
+  'postman':      'devicon:postman',
+  'figma':        'devicon:figma',
+  'aws':          'devicon:amazonwebservices-wordmark',
+};
+
+// Icons with hardcoded black color that need inversion in dark mode
+const darkIcons = new Set(['devicon:github', 'devicon:express']);
+
+function getIcon(skill: string): string {
+  return iconMap[skill.toLowerCase().trim()] ?? 'tabler:code';
+}
+
+function needsInvert(icon: string): boolean {
+  return darkIcons.has(icon);
+}
+---
+
+<section class="skills-section">
+  <div class="max-w-[90rem] mx-auto px-8">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-3 border-b py-8 border-base-200">
+      <div class="lg:sticky lg:top-24 lg:z-40 self-start">
+        <h2 class="text-sm 2xl:text-xl text-base-900 font-bold uppercase">
+          {heading}
+        </h2>
+      </div>
+
+      <div class="flex flex-col gap-5 md:gap-7 lg:gap-8 lg:col-span-2">
+        {items.map((item) => (
+          <div>
+            <h3 class="text-sm 2xl:text-xl text-base-900 font-bold uppercase mb-3">
+              {item.title}
+            </h3>
+            {item.description && (
+              <div class="flex flex-wrap gap-3">
+                {item.description.split(',').map((skill) => (
+                  <div class="skill-pill flex items-center gap-2 px-3 py-2 rounded-lg border border-base-200 bg-base-50">
+                    <Icon name={getIcon(skill)} class={`skill-icon w-5 h-5 shrink-0${needsInvert(getIcon(skill)) ? ' invert-dark' : ''}`} />
+                    <span class="text-xs 2xl:text-sm text-base-700 font-medium">
+                      {skill.trim()}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .skill-pill {
+    opacity: 0;
+    transform: scale(0.7) translateY(10px);
+    transition:
+      opacity 450ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      transform 450ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      border-color 200ms ease,
+      box-shadow 200ms ease;
+  }
+
+  .skill-pill.visible {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    animation: pill-float 4s ease-in-out infinite;
+    animation-delay: var(--float-delay, 0ms);
+  }
+
+  .skill-pill:hover {
+    animation-play-state: paused;
+    transform: scale(1.06) translateY(-4px);
+    border-color: var(--color-accent);
+    box-shadow: 0 6px 20px color-mix(in oklab, var(--color-accent) 30%, transparent);
+  }
+
+  .skill-pill:hover .skill-icon {
+    animation: icon-spin 600ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  @keyframes pill-float {
+    0%, 100% { transform: scale(1) translateY(0px); }
+    50%       { transform: scale(1) translateY(-3px); }
+  }
+
+  @keyframes icon-spin {
+    0%   { transform: rotate(0deg) scale(1); }
+    50%  { transform: rotate(180deg) scale(1.2); }
+    100% { transform: rotate(360deg) scale(1); }
+  }
+</style>
+
+<script>
+  const section = document.querySelector('.skills-section');
+  const pills = section ? Array.from(section.querySelectorAll('.skill-pill')) : [];
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        pills.forEach((pill, i) => {
+          const delay = i * 50;
+          (pill as HTMLElement).style.setProperty('--float-delay', `${(i % 5) * 600}ms`);
+          setTimeout(() => pill.classList.add('visible'), delay);
+        });
+        observer.disconnect();
+      }
+    });
+  }, { threshold: 0.1 });
+
+  if (section) observer.observe(section);
+</script>

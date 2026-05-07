@@ -7,6 +7,8 @@ import { slugify, withBase } from '../../utils/slugify';
 
 const site = await getSite();
 
+export const prerender = true;
+
 export async function getStaticPaths() {
 	const posts = await getCollection('blog');
 	const tags = new Map<string, string>();
@@ -56,7 +58,7 @@ posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 						date={post.data.pubDate}
 						image={post.data.heroImage}
 						imageAlt={post.data.title}
-						variant="post"
+	
 					>
 						{post.data.tags.length > 0 && (
 							<div class="flex flex-wrap gap-2 pt-1 text-sm text-muted">

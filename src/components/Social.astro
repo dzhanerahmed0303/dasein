@@ -1,5 +1,6 @@
 ---
 import { getSite } from '../utils/consts';
+import { Icon } from 'astro-icon/components';
 
 const site = await getSite();
 const social: Array<{ id: string; label: string; href: string }> = (site.social || []) as Array<{ id: string; label: string; href: string }>;
@@ -10,24 +11,37 @@ export interface Props {
 }
 
 const { heading = 'Socials', class: className = '' } = Astro.props as Props;
+
+const iconMap: Record<string, string> = {
+  github:   'devicon:github',
+  linkedin: 'devicon:linkedin',
+  x:        'tabler:brand-x',
+  twitter:  'tabler:brand-twitter',
+  email:    'tabler:mail',
+  instagram:'tabler:brand-instagram',
+  youtube:  'tabler:brand-youtube',
+};
+
+const darkIcons = new Set(['devicon:github']);
 ---
 
-<section class={className}>
+<section class={`social-section ${className}`}>
   <div class="max-w-360 mx-auto px-8">
     <div class="grid grid-cols-1 gap-4 md:grid-cols-3 border-b py-8 border-base-200">
       <div class="lg:sticky lg:top-24 lg:z-40 self-start">
         <h2 class="text-sm 2xl:text-xl text-base-900 font-bold uppercase">{heading}</h2>
       </div>
 
-      <div class="flex flex-col gap-2 lg:col-span-2">
+      <div class="flex flex-wrap gap-2 md:gap-3 lg:col-span-2">
         {social.map((s: { id: string; label: string; href: string }) => (
           <a
-            class="text-xs 2xl:text-lg text-base-900 hover:text-base-500 font-bold uppercase"
+            class="social-pill flex items-center gap-2 px-3 py-2 rounded-lg border border-base-200 bg-base-50"
             href={s.href}
             target={s.href && !s.href.startsWith('#') && !s.href.startsWith('mailto:') ? '_blank' : undefined}
             rel={s.href && !s.href.startsWith('#') && !s.href.startsWith('mailto:') ? 'noreferrer' : undefined}
           >
-            {s.label}
+            <Icon name={iconMap[s.id.toLowerCase()] ?? 'tabler:link'} class={`w-5 h-5 shrink-0${darkIcons.has(iconMap[s.id.toLowerCase()] ?? '') ? ' invert-dark' : ''}`} />
+            <span class="text-xs 2xl:text-sm text-base-700 font-medium uppercase">{s.label}</span>
           </a>
         ))}
 
@@ -36,3 +50,46 @@ const { heading = 'Socials', class: className = '' } = Astro.props as Props;
     </div>
   </div>
 </section>
+
+<style>
+  .social-pill {
+    opacity: 0;
+    transform: scale(0.7) translateY(10px);
+    transition:
+      opacity 450ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      transform 450ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      border-color 200ms ease,
+      box-shadow 200ms ease;
+  }
+
+  .social-pill.visible {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    animation: social-float 4s ease-in-out infinite;
+    animation-delay: var(--float-delay, 0ms);
+  }
+
+  @keyframes social-float {
+    0%, 100% { transform: scale(1) translateY(0px); }
+    50%       { transform: scale(1) translateY(-3px); }
+  }
+</style>
+
+<script>
+  const section = document.querySelector('.social-section');
+  const pills = section ? Array.from(section.querySelectorAll('.social-pill')) : [];
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        pills.forEach((pill, i) => {
+          (pill as HTMLElement).style.setProperty('--float-delay', `${(i % 4) * 500}ms`);
+          setTimeout(() => pill.classList.add('visible'), i * 80);
+        });
+        observer.disconnect();
+      }
+    });
+  }, { threshold: 0.1 });
+
+  if (section) observer.observe(section);
+</script>

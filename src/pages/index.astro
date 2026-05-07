@@ -8,6 +8,7 @@ import { getCollection } from "astro:content";
 import { getSite } from '../utils/consts';
 import ProjectList from '../components/ProjectList.astro';
 import Social from '../components/Social.astro';
+import SkillsGrid from '../components/SkillsGrid.astro';
 
 const cv = (await getCollection("cv" as any)) as any[];
 
@@ -24,7 +25,7 @@ const site = await getSite();
 		location={site.author.location}
 		actions={[
 			{ label: 'View Blog', href: '/blog' },
-			{ label: 'Get Quote', href: '/contact' },
+			{ label: 'Contact', href: '/contact' },
 		]}
 	/>
 
@@ -46,6 +47,14 @@ const site = await getSite();
             {
                 cv.map((section) => {
                     if (section.data.items) {
+                        if (section.id === 'skills') {
+                            return (
+                                <SkillsGrid
+                                    heading={section.data.heading}
+                                    items={section.data.items}
+                                />
+                            );
+                        }
                         return (
                             <SectionList
                                 heading={section.data.heading}
