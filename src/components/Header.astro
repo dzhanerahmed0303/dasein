@@ -52,9 +52,11 @@ import ThemeToggle from "./ThemeToggle.astro";
   const burgerTl = gsap.timeline({ paused: true });
 
   burgerTl
-    .to(lines[1], { scaleX: 0, opacity: 0, duration: 0.1, ease: 'power2.in' })
-    .to(lines[0], { y: 8, rotation: 45, duration: 0.2, ease: 'power3.inOut' }, '-=0.05')
-    .to(lines[2], { y: -8, rotation: -45, duration: 0.2, ease: 'power3.inOut' }, '<');
+    .to(lines[0], { y: 8, duration: 0.2, ease: 'power2.inOut' })
+    .to(lines[2], { y: -8, duration: 0.2, ease: 'power2.inOut' }, '<')
+    .to(lines[1], { scaleX: 0, opacity: 0, duration: 0.15, ease: 'power2.in' }, '<')
+    .to(lines[0], { rotation: 45, duration: 0.28, ease: 'expo.out' })
+    .to(lines[2], { rotation: -45, duration: 0.28, ease: 'expo.out' }, '<');
 
   if (burger) {
     new MutationObserver(() => {
