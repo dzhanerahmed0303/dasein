@@ -1,1 +1,0 @@
-import{g as t}from"./index.xgxdCp6f.js";const e=document.getElementById("page-curtain");e&&(t.to(e,{yPercent:-100,duration:.85,ease:"expo.inOut",onComplete:()=>e.remove()}),setTimeout(()=>e.remove(),2e3));
