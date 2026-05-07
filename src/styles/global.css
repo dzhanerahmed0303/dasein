@@ -2,14 +2,14 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --color-ink: #000000;
-  --color-muted: color-mix(in oklab, var(--color-ink) 72%, transparent);
-  --color-paper: #ffffff;
-  --color-surface: #ffffff;
-  --color-border: color-mix(in oklab, var(--color-ink) 14%, transparent);
-  --color-accent: #3b82f6;
+  --color-ink: #0f0f1a;
+  --color-muted: color-mix(in oklab, var(--color-ink) 60%, transparent);
+  --color-paper: #f0f4ff;
+  --color-surface: #f8faff;
+  --color-border: color-mix(in oklab, var(--color-ink) 12%, transparent);
+  --color-accent: #4f46e5;
   --radius-card: 24px;
-  --grid-line: color-mix(in oklab, var(--color-ink) 10%, transparent);
+  --grid-line: color-mix(in oklab, var(--color-ink) 8%, transparent);
 }
 
 @layer base {
@@ -48,7 +48,11 @@
     line-height: 1.6;
     color: var(--color-ink);
     background-color: var(--color-paper);
-    background-image: linear-gradient(160deg, var(--color-paper) 0%, #e0e0e0 100%);
+    background-image:
+      radial-gradient(ellipse at 12% 35%, color-mix(in oklab, #4f46e5 30%, transparent) 0%, transparent 55%),
+      radial-gradient(ellipse at 88% 8%, color-mix(in oklab, #a855f7 26%, transparent) 0%, transparent 50%),
+      radial-gradient(ellipse at 55% 90%, color-mix(in oklab, #3b82f6 20%, transparent) 0%, transparent 45%),
+      linear-gradient(160deg, #f0f4ff 0%, #ede9fe 100%);
   }
 
   :root[data-theme="dark"] body {
@@ -327,9 +331,8 @@
   .blob {
     position: absolute;
     border-radius: 50%;
-    filter: blur(90px);
-    opacity: 0.25;
-    background: color-mix(in oklab, var(--color-accent) 50%, transparent);
+    filter: blur(100px);
+    opacity: 0.55;
   }
 
   :root[data-theme="dark"] .blob {
@@ -337,31 +340,38 @@
   }
 
   .blob-1 {
-    width: 500px;
-    height: 500px;
-    top: 30%;
-    left: 5%;
+    width: 560px;
+    height: 560px;
+    top: 20%;
+    left: 0%;
+    background: color-mix(in oklab, #4f46e5 80%, transparent);
     animation: blob-float-1 12s ease-in-out infinite;
   }
 
   .blob-2 {
-    width: 400px;
-    height: 400px;
-    top: 0%;
-    right: 5%;
+    width: 480px;
+    height: 480px;
+    top: -5%;
+    right: 0%;
+    background: color-mix(in oklab, #a855f7 80%, transparent);
     animation: blob-float-2 15s ease-in-out infinite;
     animation-delay: -4s;
   }
 
   .blob-3 {
-    width: 300px;
-    height: 300px;
-    bottom: 10%;
-    right: 25%;
+    width: 360px;
+    height: 360px;
+    bottom: 8%;
+    right: 20%;
+    background: color-mix(in oklab, #3b82f6 80%, transparent);
     animation: blob-float-3 10s ease-in-out infinite;
     animation-delay: -7s;
-    opacity: 0.3;
+    opacity: 0.45;
   }
+
+  :root[data-theme="dark"] .blob-1 { background: color-mix(in oklab, #4f46e5 80%, transparent); }
+  :root[data-theme="dark"] .blob-2 { background: color-mix(in oklab, #a855f7 80%, transparent); }
+  :root[data-theme="dark"] .blob-3 { background: color-mix(in oklab, #3b82f6 80%, transparent); }
 
   @media (max-width: 768px) {
     .blob-1 { width: 260px; height: 260px; }
