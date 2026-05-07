@@ -2,12 +2,12 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --color-ink: #0f0f1a;
+  --color-ink: #0a0f1e;
   --color-muted: color-mix(in oklab, var(--color-ink) 60%, transparent);
-  --color-paper: #f0f4ff;
-  --color-surface: #f8faff;
+  --color-paper: #f0f7ff;
+  --color-surface: #f6fbff;
   --color-border: color-mix(in oklab, var(--color-ink) 12%, transparent);
-  --color-accent: #4f46e5;
+  --color-accent: #0284c7;
   --radius-card: 24px;
   --grid-line: color-mix(in oklab, var(--color-ink) 8%, transparent);
 }
@@ -49,10 +49,10 @@
     color: var(--color-ink);
     background-color: var(--color-paper);
     background-image:
-      radial-gradient(ellipse at 12% 35%, color-mix(in oklab, #4f46e5 30%, transparent) 0%, transparent 55%),
-      radial-gradient(ellipse at 88% 8%, color-mix(in oklab, #a855f7 26%, transparent) 0%, transparent 50%),
-      radial-gradient(ellipse at 55% 90%, color-mix(in oklab, #3b82f6 20%, transparent) 0%, transparent 45%),
-      linear-gradient(160deg, #f0f4ff 0%, #ede9fe 100%);
+      radial-gradient(ellipse at 10% 30%, color-mix(in oklab, #0284c7 30%, transparent) 0%, transparent 52%),
+      radial-gradient(ellipse at 90% 10%, color-mix(in oklab, #0d9488 26%, transparent) 0%, transparent 48%),
+      radial-gradient(ellipse at 55% 88%, color-mix(in oklab, #1d4ed8 22%, transparent) 0%, transparent 45%),
+      linear-gradient(160deg, #f0f7ff 0%, #e8f4f8 100%);
   }
 
   :root[data-theme="dark"] body {
@@ -344,7 +344,7 @@
     height: 560px;
     top: 20%;
     left: 0%;
-    background: color-mix(in oklab, #4f46e5 80%, transparent);
+    background: color-mix(in oklab, #0284c7 80%, transparent);
     animation: blob-float-1 12s ease-in-out infinite;
   }
 
@@ -353,7 +353,7 @@
     height: 480px;
     top: -5%;
     right: 0%;
-    background: color-mix(in oklab, #a855f7 80%, transparent);
+    background: color-mix(in oklab, #0d9488 80%, transparent);
     animation: blob-float-2 15s ease-in-out infinite;
     animation-delay: -4s;
   }
@@ -369,9 +369,9 @@
     opacity: 0.45;
   }
 
-  :root[data-theme="dark"] .blob-1 { background: color-mix(in oklab, #4f46e5 80%, transparent); }
-  :root[data-theme="dark"] .blob-2 { background: color-mix(in oklab, #a855f7 80%, transparent); }
-  :root[data-theme="dark"] .blob-3 { background: color-mix(in oklab, #3b82f6 80%, transparent); }
+  :root[data-theme="dark"] .blob-1 { background: color-mix(in oklab, #0284c7 80%, transparent); }
+  :root[data-theme="dark"] .blob-2 { background: color-mix(in oklab, #0d9488 80%, transparent); }
+  :root[data-theme="dark"] .blob-3 { background: color-mix(in oklab, #1d4ed8 80%, transparent); }
 
   @media (max-width: 768px) {
     .blob-1 { width: 260px; height: 260px; }
