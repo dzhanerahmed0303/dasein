@@ -27,15 +27,17 @@ import ThemeToggle from "./ThemeToggle.astro";
       <ThemeToggle class="text-xs 2xl:text-lg text-base-900 hover:text-base-500 font-bold uppercase" />
     </div>
 
-    <!-- Mobile modal menu (brutalist, simple) -->
-    <div id="mobile-nav" role="dialog" aria-label="Mobile navigation" aria-hidden="true" style="display:none;" class="fixed inset-0 z-[1000] p-8 overflow-auto bg-[var(--color-paper)] text-[var(--color-ink)]">
-      <button id="mobile-close" aria-label="Close navigation" style="position:absolute;right:1rem;top:1rem;" class="text-xs 2xl:text-lg font-bold uppercase">Close</button>
-      <div class="flex flex-col gap-2 items-start text-xs 2xl:text-lg hover:text-base-500 font-bold uppercase">
-        <HeaderLink href="/">Home</HeaderLink>
-        <HeaderLink href="/blog">Blog</HeaderLink>
-        <HeaderLink href="/projects">Projects</HeaderLink>
-        <HeaderLink href="/about">About</HeaderLink>
-        <ThemeToggle class="text-xs 2xl:text-lg hover:text-base-500 font-bold uppercase" />
+    <!-- Mobile modal menu -->
+    <div id="mobile-nav" role="dialog" aria-label="Mobile navigation" aria-hidden="true" style="display:none;" class="fixed inset-0 z-[1000] flex flex-col justify-center px-10 py-12 bg-[var(--color-paper)] text-[var(--color-ink)]">
+      <button id="mobile-close" aria-label="Close navigation" class="absolute right-6 top-6 w-12 h-12 flex items-center justify-center rounded-full border border-[var(--color-border)] text-sm font-bold uppercase">✕</button>
+      <nav class="flex flex-col gap-8">
+        <HeaderLink href="/" class="text-4xl font-extrabold uppercase tracking-tight">Home</HeaderLink>
+        <HeaderLink href="/blog" class="text-4xl font-extrabold uppercase tracking-tight">Blog</HeaderLink>
+        <HeaderLink href="/projects" class="text-4xl font-extrabold uppercase tracking-tight">Projects</HeaderLink>
+        <HeaderLink href="/about" class="text-4xl font-extrabold uppercase tracking-tight">About</HeaderLink>
+      </nav>
+      <div class="mt-10">
+        <ThemeToggle class="text-sm font-bold uppercase" />
       </div>
     </div>
   </nav>
@@ -47,12 +49,12 @@ import ThemeToggle from "./ThemeToggle.astro";
   const burger = document.getElementById('nav-toggle') as HTMLElement | null;
   const lines = burger ? Array.from(burger.querySelectorAll('.burger-line')) : [];
 
-  const burgerTl = gsap.timeline({ paused: true, defaults: { ease: 'elastic.out(1, 0.5)' } });
+  const burgerTl = gsap.timeline({ paused: true });
 
   burgerTl
-    .to(lines[1], { scaleX: 0, opacity: 0, duration: 0.18, ease: 'power2.in' })
-    .to(lines[0], { y: 8, rotation: 45, duration: 0.55 }, '-=0.05')
-    .to(lines[2], { y: -8, rotation: -45, duration: 0.55 }, '<');
+    .to(lines[1], { scaleX: 0, opacity: 0, duration: 0.1, ease: 'power2.in' })
+    .to(lines[0], { y: 8, rotation: 45, duration: 0.2, ease: 'power3.inOut' }, '-=0.05')
+    .to(lines[2], { y: -8, rotation: -45, duration: 0.2, ease: 'power3.inOut' }, '<');
 
   if (burger) {
     new MutationObserver(() => {
