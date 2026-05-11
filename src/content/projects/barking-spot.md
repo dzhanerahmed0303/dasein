@@ -1,7 +1,7 @@
 ---
 title: Barking Spot
 description: Created a platform where dog owners can find a safe and trusted place to leave their dogs temporarily when they need to be away.
-pubDate: 2026-04-28
+pubDate: 2025-09-28
 heroImage: ../../assets/Barkingspot.png
 ---
 

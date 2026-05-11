@@ -1,7 +1,7 @@
 ---
 title: West Auto Webshop
 description: Developed an online car webshop featuring a clear product catalog and intuitive page structure.
-pubDate: 2026-04-10
+pubDate: 2024-04-10
 heroImage: ../../assets/WestAuto.png
 updatedDate: 2026-01-12
 ---
