@@ -4,7 +4,7 @@ skills:
     - title: "Languages"
       description: "JavaScript, TypeScript, C#, Java"
     - title: "Frontend"
-      description: "HTML, CSS, React, React Native, Astro, Leaflet, Tailwind"
+      description: "HTML, CSS, React, React Native, Next.js, Astro, Leaflet, Tailwind"
     - title: "Backend"
       description: "Node.js, Express, MongoDB, SQL"
     - title: "Tools"
