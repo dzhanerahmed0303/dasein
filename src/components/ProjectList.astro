@@ -47,6 +47,8 @@ const baseUrl =
                             title={project.data.title}
                             href={withBase(`/projects/${project.id}/`)}
                             description={project.data.description}
+                            image={project.data.heroImage}
+                            imageAlt={project.data.title}
                         />
                     </div>
                 ))}

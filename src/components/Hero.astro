@@ -31,7 +31,7 @@ const { title, description, actions = [], role, location } = Astro.props as Prop
         width={520}
         height={640}
         quality={100}
-        class="order-1 lg:order-2 rounded-3xl object-cover object-[center_20%] lg:object-top w-full h-80 sm:h-96 lg:w-64 lg:h-80 xl:w-72 xl:h-96 2xl:w-88 2xl:h-[30rem] shrink-0 shadow-[0_20px_60px_-10px_rgba(0,0,0,0.18),0_8px_24px_-6px_rgba(0,0,0,0.10)]"
+        class="hero-photo order-1 lg:order-2 rounded-3xl object-cover object-[center_20%] lg:object-top w-full h-80 sm:h-96 lg:w-64 lg:h-80 xl:w-72 xl:h-96 2xl:w-88 2xl:h-[30rem] shrink-0 shadow-[0_20px_60px_-10px_rgba(0,0,0,0.18),0_8px_24px_-6px_rgba(0,0,0,0.10)]"
       />
       <div
         class="order-2 lg:order-1 flex-1 hero-letters text-[13vw] lg:text-[8vw] 2xl:text-[10vw] leading-[0.85] font-extrabold text-base-900 uppercase"
@@ -88,6 +88,6 @@ const { title, description, actions = [], role, location } = Astro.props as Prop
   const tl = gsap.timeline({ defaults: { ease: 'power3.out' }, delay: 0.7 });
 
   tl.from('.hero-letters', { opacity: 0, y: 60, duration: 0.9 })
-    .from('section img', { opacity: 0, x: 40, duration: 0.7 }, '-=0.5')
+    .from('.hero-photo', { opacity: 0, x: 40, duration: 0.7 }, '-=0.5')
     .from('section .max-w-360 > div > div', { opacity: 0, y: 20, duration: 0.6, stagger: 0.1 }, '-=0.3');
 </script>

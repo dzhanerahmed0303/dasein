@@ -2,7 +2,7 @@ skills:
   heading: "Skills"
   items:
     - title: "Languages"
-      description: "JavaScript, TypeScript, C#, Java"
+      description: "JavaScript, TypeScript, C#"
     - title: "Frontend"
       description: "HTML, CSS, React, React Native, Next.js, Astro, Leaflet, Tailwind"
     - title: "Backend"
