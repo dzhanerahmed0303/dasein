@@ -13,6 +13,9 @@ gallery:
   - ../../assets/Rescura/img7.png
   - ../../assets/Rescura/img8.png
   - ../../assets/Rescura/img9.png
+tags: [TypeScript, React, Tailwind CSS, shadcn/ui, D3, i18next, AWS Cognito]
 ---
 
 ResCura is an online dashboard for managing first-aid kits across multiple locations. It lets you see exactly where every kit is placed, what's supposed to be inside it, and whether anything is missing, used up, or about to expire, so kits can be refilled before they're actually needed. Each site and customer can be tracked separately, support requests are handled through a built-in ticket system, and access is role-based, so a reseller only sees their own customers, and a customer only sees their own kits and locations. It was built for Medikits, a company that supplies and maintains first-aid kits for businesses, to give them one central place to manage their entire kit inventory, their customers, and their support workflow instead of juggling spreadsheets and emails.
+
+The frontend is built with TypeScript, React and Tailwind CSS, using shadcn/ui for the component system, D3 and Visx for the charts, and i18next for multi-language support (Dutch, English, French, Danish and more). The app communicates with a serverless REST API, uses AWS Cognito for authentication and role-based access, and sends transactional emails through AWS SES with templates built in React Email.

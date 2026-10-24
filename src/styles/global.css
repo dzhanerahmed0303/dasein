@@ -10,6 +10,7 @@
   --color-accent: #f97316;
   --radius-card: 24px;
   --grid-line: color-mix(in oklab, var(--color-ink) 8%, transparent);
+  --grid-line-bg: color-mix(in oklab, var(--color-ink) 4.5%, transparent);
 }
 
 @layer base {
@@ -39,6 +40,7 @@
     --color-surface: #131318;
     --color-border: color-mix(in oklab, var(--color-ink) 16%, transparent);
     --grid-line: color-mix(in oklab, var(--color-ink) 10%, transparent);
+    --grid-line-bg: color-mix(in oklab, var(--color-ink) 5%, transparent);
   }
   *,
   *::before,
@@ -55,18 +57,11 @@
     line-height: 1.6;
     color: var(--color-ink);
     background-color: var(--color-paper);
+    /* Subtle grid that follows the --grid-cell layout */
     background-image:
-      radial-gradient(ellipse at 8% 25%, color-mix(in oklab, #1e3a5f 28%, transparent) 0%, transparent 52%),
-      radial-gradient(ellipse at 92% 8%, color-mix(in oklab, #f97316 22%, transparent) 0%, transparent 48%),
-      radial-gradient(ellipse at 50% 92%, color-mix(in oklab, #1e40af 18%, transparent) 0%, transparent 45%),
-      linear-gradient(160deg, #f5f6f8 0%, #eef0f5 100%);
-  }
-
-  :root[data-theme="dark"] body {
-    background-image:
-      radial-gradient(ellipse at 15% 60%, color-mix(in oklab, var(--color-accent) 20%, transparent) 0%, transparent 50%),
-      radial-gradient(ellipse at 85% 10%, color-mix(in oklab, var(--color-accent) 14%, transparent) 0%, transparent 45%),
-      linear-gradient(160deg, #0d0d10 0%, #252530 100%);
+      linear-gradient(to bottom, var(--grid-line-bg) 1px, transparent 1px),
+      linear-gradient(to right, var(--grid-line-bg) 1px, transparent 1px);
+    background-size: var(--grid-cell-x) var(--grid-cell-y);
   }
 
   a {
@@ -415,89 +410,6 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-  }
-
-  /* Animated background blobs */
-  .blob-container {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    overflow: hidden;
-  }
-
-  .blob {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(100px);
-    opacity: 0.55;
-  }
-
-  :root[data-theme="dark"] .blob {
-    opacity: 0.18;
-  }
-
-  .blob-1 {
-    width: 560px;
-    height: 560px;
-    top: 20%;
-    left: 0%;
-    background: color-mix(in oklab, #1e3a5f 80%, transparent);
-    animation: blob-float-1 12s ease-in-out infinite;
-  }
-
-  .blob-2 {
-    width: 480px;
-    height: 480px;
-    top: -5%;
-    right: 0%;
-    background: color-mix(in oklab, #f97316 80%, transparent);
-    animation: blob-float-2 15s ease-in-out infinite;
-    animation-delay: -4s;
-  }
-
-  .blob-3 {
-    width: 360px;
-    height: 360px;
-    bottom: 8%;
-    right: 20%;
-    background: color-mix(in oklab, #3b82f6 80%, transparent);
-    animation: blob-float-3 10s ease-in-out infinite;
-    animation-delay: -7s;
-    opacity: 0.45;
-  }
-
-  :root[data-theme="dark"] .blob-1 { background: color-mix(in oklab, #1e3a5f 80%, transparent); }
-  :root[data-theme="dark"] .blob-2 { background: color-mix(in oklab, #f97316 80%, transparent); }
-  :root[data-theme="dark"] .blob-3 { background: color-mix(in oklab, #1e40af 80%, transparent); }
-
-  @media (max-width: 768px) {
-    .blob-1 { width: 260px; height: 260px; }
-    .blob-2 { width: 200px; height: 200px; }
-    .blob-3 { width: 150px; height: 150px; }
-  }
-
-  @media (max-width: 480px) {
-    .blob-1 { width: 180px; height: 180px; }
-    .blob-2 { width: 140px; height: 140px; }
-    .blob-3 { display: none; }
-  }
-
-  @keyframes blob-float-1 {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    33%       { transform: translate(40px, -30px) scale(1.08); }
-    66%       { transform: translate(-25px, 20px) scale(0.94); }
-  }
-
-  @keyframes blob-float-2 {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    40%       { transform: translate(-50px, 35px) scale(1.1); }
-    70%       { transform: translate(30px, -20px) scale(0.92); }
-  }
-
-  @keyframes blob-float-3 {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    50%       { transform: translate(-35px, -40px) scale(1.12); }
   }
 
   /* Scroll reveal */
