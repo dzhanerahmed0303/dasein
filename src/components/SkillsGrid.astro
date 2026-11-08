@@ -129,21 +129,24 @@ function needsInvert(icon: string): boolean {
 </style>
 
 <script>
-  const section = document.querySelector('.skills-section');
-  const pills = section ? Array.from(section.querySelectorAll('.skill-pill')) : [];
+  // Module scripts run once; astro:page-load fires on the first load and after every page switch.
+  document.addEventListener('astro:page-load', () => {
+    const section = document.querySelector('.skills-section');
+    const pills = section ? Array.from(section.querySelectorAll('.skill-pill')) : [];
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        pills.forEach((pill, i) => {
-          const delay = i * 50;
-          (pill as HTMLElement).style.setProperty('--float-delay', `${(i % 5) * 600}ms`);
-          setTimeout(() => pill.classList.add('visible'), delay);
-        });
-        observer.disconnect();
-      }
-    });
-  }, { threshold: 0.1 });
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          pills.forEach((pill, i) => {
+            const delay = i * 50;
+            (pill as HTMLElement).style.setProperty('--float-delay', `${(i % 5) * 600}ms`);
+            setTimeout(() => pill.classList.add('visible'), delay);
+          });
+          observer.disconnect();
+        }
+      });
+    }, { threshold: 0.1 });
 
-  if (section) observer.observe(section);
+    if (section) observer.observe(section);
+  });
 </script>

@@ -1,0 +1,251 @@
+---
+/**
+ * 3D character that looks in the general direction of the cursor.
+ *
+ * The images in public/character/ are the sharpest moments of a video of the character
+ * looking around (background removed, full 960×720). The screen around the face is split into
+ * the centre plus 8 directions, in two rings: with the cursor fairly close the character looks
+ * a little that way ("near" poses, where the video has one), further away it looks fully that
+ * way. When the pose changes, the new one quickly fades in over the old one. Nothing else
+ * moves, so the bottom of the bust stays in place.
+ */
+import { withBase } from '../utils/slugify';
+
+interface Props {
+  alt: string;
+  class?: string;
+}
+
+const { alt, class: className } = Astro.props;
+
+// Direction → pose image. "…Near" = looking a little that way (inner ring); directions
+// without a near pose use the full pose in both rings.
+const poses: Record<string, string> = {
+  center: 'v-095.webp',
+  up: 'v-011.webp',
+  upNear: 'v-007.webp', // head straight, eyes up
+  upLeft: 'v-024.webp',
+  upRight: 'v-039.webp',
+  upRightNear: 'v-035.webp', // turned less far
+  // k-… = from the second video (kling_…mp4); its blink (frames 23–33) is never used.
+  right: 'k-137.webp', // head turned fully right
+  rightNear: 'k-080.webp', // head straight, eyes right
+  downRight: 'v-056.webp',
+  down: 'v-087.webp', // looks slightly down (the video has no sharp full "down")
+  downLeft: 'v-076.webp', // the "left" pose looks slightly down, so it serves both
+  left: 'v-076.webp',
+  leftNear: 'v-080.webp', // head almost straight, eyes left
+};
+
+const files = [...new Set(Object.values(poses))];
+---
+
+<div class:list={['character-follow', className]} data-character data-poses={JSON.stringify(poses)}>
+  <div class="character-follow__breathe">
+    {
+      files.map((file) => (
+        <img
+          class:list={['character-follow__pose', file === poses.center && 'is-active']}
+          data-pose={file}
+          src={withBase(`/character/${file}`)}
+          alt={file === poses.center ? alt : ''}
+          aria-hidden={file === poses.center ? undefined : 'true'}
+          width="960"
+          height="720"
+          decoding="async"
+          fetchpriority={file === poses.center ? 'high' : 'low'}
+        />
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .character-follow {
+    position: relative;
+    aspect-ratio: 960 / 720;
+  }
+
+  /* Very slow, subtle breathing: only stretches upwards, so the bottom edge stays put. */
+  .character-follow__breathe {
+    position: absolute;
+    inset: 0;
+    transform-origin: 50% 100%;
+    animation: character-breathe 4.5s ease-in-out infinite;
+  }
+
+  .character-follow__pose {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: bottom;
+    opacity: 0;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  /*
+    New pose fades in on top. The previous pose stays fully visible underneath until the
+    new one has mostly covered it, so the character is never see-through halfway.
+  */
+  .character-follow__pose.is-active {
+    z-index: 2;
+    opacity: 1;
+    transition: opacity 0.18s ease-out;
+  }
+
+  .character-follow__pose.is-leaving {
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.12s ease-in 0.1s;
+  }
+
+  @keyframes character-breathe {
+    0%, 100% { transform: scale(1, 1); }
+    50% { transform: scale(1, 1.008); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .character-follow__pose.is-active,
+    .character-follow__pose.is-leaving {
+      transition: none;
+    }
+
+    .character-follow__breathe {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  type Direction = 'up' | 'upLeft' | 'upRight' | 'right' | 'downRight' | 'down' | 'downLeft' | 'left';
+
+  // The face sits in the upper part of the image; cursor directions are measured from there.
+  const FACE_Y = 0.35;
+  // Distances from the face (0–1, relative to the distance to the screen edge):
+  // closer than CENTER_RADIUS = looks at you; up to NEAR_RADIUS = looks a little that way.
+  const CENTER_RADIUS = 0.18;
+  const NEAR_RADIUS = 0.45;
+  // Extra margin before leaving the current ring/direction, so it doesn't flip back and forth.
+  const RING_MARGIN = 0.05;
+  const ANGLE_MARGIN = 10; // degrees
+
+  // 8 directions by angle on screen (0° = right, 90° = down).
+  const DIRECTIONS: [Direction, number][] = [
+    ['right', 0],
+    ['downRight', 45],
+    ['down', 90],
+    ['downLeft', 135],
+    ['left', 180],
+    ['upLeft', -135],
+    ['up', -90],
+    ['upRight', -45],
+  ];
+
+  const angleBetween = (a: number, b: number) => Math.abs(((a - b + 540) % 360) - 180);
+
+  // Runs once; set up on every page that has the character, cleaned up when leaving it.
+  let cleanup: (() => void) | null = null;
+
+  const start = (root: HTMLElement) => {
+    const poses: Record<string, string> = JSON.parse(root.dataset.poses ?? '{}');
+    const images = Array.from(root.querySelectorAll<HTMLImageElement>('[data-pose]'));
+
+    let ring: 'center' | 'near' | 'far' = 'center';
+    let direction: Direction | null = null;
+    let shownFile = poses.center;
+    let stopped = false;
+
+    const show = () => {
+      const entry = DIRECTIONS.find(([name]) => name === direction);
+      const nearKey = `${direction}Near`;
+      const file =
+        ring === 'center' || !entry
+          ? poses.center
+          : ring === 'near' && poses[nearKey]
+            ? poses[nearKey]
+            : poses[direction as Direction];
+
+      if (file === shownFile) return;
+      const from = images.find((img) => img.dataset.pose === shownFile);
+      const to = images.find((img) => img.dataset.pose === file);
+      shownFile = file;
+      if (!to) return;
+      images.forEach((img) => img.classList.remove('is-leaving'));
+      from?.classList.remove('is-active');
+      from?.classList.add('is-leaving');
+      to.classList.add('is-active');
+    };
+
+    const update = (dx: number, dy: number) => {
+      const distance = Math.hypot(dx, dy);
+      // Rings, with a margin around the current one.
+      const centerLimit = CENTER_RADIUS + (ring === 'center' ? RING_MARGIN : 0);
+      const nearLimit = NEAR_RADIUS + (ring === 'near' ? RING_MARGIN : ring === 'far' ? -RING_MARGIN : 0);
+      const nextRing = distance < centerLimit ? 'center' : distance < nearLimit ? 'near' : 'far';
+
+      let nextDirection = direction;
+      if (nextRing === 'center') {
+        nextDirection = null;
+      } else {
+        const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+        const current = DIRECTIONS.find(([name]) => name === direction);
+        // Stay in the current direction while the cursor is still near it.
+        if (!current || angleBetween(angle, current[1]) > 22.5 + ANGLE_MARGIN) {
+          nextDirection = DIRECTIONS.reduce((best, d) =>
+            angleBetween(angle, d[1]) < angleBetween(angle, best[1]) ? d : best,
+          )[0];
+        }
+      }
+
+      if (nextRing === ring && nextDirection === direction) return;
+      ring = nextRing;
+      direction = nextDirection;
+      show();
+    };
+
+    // Direction from the character's face to the cursor, scaled to the space between face and screen edge.
+    const onPointerMove = (event: PointerEvent) => {
+      const rect = root.getBoundingClientRect();
+      const faceX = rect.left + rect.width / 2;
+      const faceY = rect.top + rect.height * FACE_Y;
+      const dx = event.clientX - faceX;
+      const dy = event.clientY - faceY;
+      const spanX = dx < 0 ? faceX : window.innerWidth - faceX;
+      const spanY = dy < 0 ? faceY : window.innerHeight - faceY;
+      update(dx / Math.max(spanX, 1), dy / Math.max(spanY, 1));
+    };
+
+    // Back to looking at the visitor when the cursor leaves the window.
+    const onPointerLeave = () => {
+      ring = 'center';
+      direction = null;
+      show();
+    };
+
+    // Start following once every pose is decoded, so the first switch has no loading flash.
+    Promise.all(images.map((img) => img.decode().catch(() => undefined))).then(() => {
+      if (stopped) return;
+      window.addEventListener('pointermove', onPointerMove, { passive: true });
+      document.documentElement.addEventListener('pointerleave', onPointerLeave);
+    });
+
+    return () => {
+      stopped = true;
+      window.removeEventListener('pointermove', onPointerMove);
+      document.documentElement.removeEventListener('pointerleave', onPointerLeave);
+    };
+  };
+
+  document.addEventListener('astro:page-load', () => {
+    const root = document.querySelector<HTMLElement>('[data-character]');
+    if (root) cleanup = start(root);
+  });
+
+  document.addEventListener('astro:before-swap', () => {
+    cleanup?.();
+    cleanup = null;
+  });
+</script>

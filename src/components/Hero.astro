@@ -14,8 +14,7 @@ interface Props {
 }
 
 import { withBase } from "../utils/slugify";
-import { Image } from "astro:assets";
-import profilePhoto from "../assets/Dzhaner.png";
+import CharacterFollow from "./CharacterFollow.astro";
 
 const isExternal = (path: string) => /^[a-z][a-z0-9+.-]*:/i.test(path) || path.startsWith('//');
 
@@ -23,15 +22,16 @@ const { title, description, actions = [], role, location } = Astro.props as Prop
 ---
 
 <section class="flex flex-col justify-between" style="min-height: calc(100vh - (var(--grid-cell) / 2));">
-  <div class="grid gap-3 md:gap-4 pb-6 md:pb-10">
-    <div class="flex flex-col lg:flex-row lg:items-start gap-4 lg:gap-6">
-      <Image
-        src={profilePhoto}
-        alt={title}
-        width={520}
-        height={640}
-        quality={100}
-        class="hero-photo order-1 lg:order-2 rounded-3xl object-cover object-[center_20%] lg:object-top w-full h-80 sm:h-96 lg:w-64 lg:h-80 xl:w-72 xl:h-96 2xl:w-88 2xl:h-[30rem] shrink-0 shadow-[0_20px_60px_-10px_rgba(0,0,0,0.18),0_8px_24px_-6px_rgba(0,0,0,0.10)]"
+  <div class="flex-1 flex flex-col pb-6 md:pb-10 lg:pb-0">
+    <div class="flex-1 flex flex-col lg:flex-row lg:items-start gap-4 lg:gap-6">
+      <!--
+        Follows the cursor. On large screens the bust stands on the line above the info row
+        (self-end, no gap below), so it doesn't float. On small screens it sits above the title
+        and its cut-off bottom fades out instead.
+      -->
+      <CharacterFollow
+        alt={`3D character of ${title}`}
+        class="hero-photo order-1 lg:order-2 lg:self-end w-full max-w-md mx-auto lg:mx-0 lg:w-[24rem] xl:w-[28rem] 2xl:w-[34rem] lg:max-w-none shrink-0"
       />
       <div
         class="order-2 lg:order-1 flex-1 hero-letters text-[13vw] lg:text-[8vw] 2xl:text-[10vw] leading-[0.85] font-extrabold text-base-900 uppercase"
@@ -43,7 +43,7 @@ const { title, description, actions = [], role, location } = Astro.props as Prop
   </div>
 
   <div class="max-w-360 mx-auto px-8 w-full mt-auto">
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-3 border-b pb-8 border-base-200">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-3 border-b pb-8 border-base-200 lg:border-t lg:pt-8">
       <div>
         {role && <h1 class="text-xs 2xl:text-lg text-base-900 font-bold uppercase">{role}</h1>}
       </div>
@@ -85,9 +85,19 @@ const { title, description, actions = [], role, location } = Astro.props as Prop
 <script>
   import { gsap } from 'gsap';
 
-  const tl = gsap.timeline({ defaults: { ease: 'power3.out' }, delay: 0.7 });
+  // Module scripts run once; astro:page-load fires on the first load and after every page switch.
+  let firstLoad = true;
 
-  tl.from('.hero-letters', { opacity: 0, y: 60, duration: 0.9 })
-    .from('.hero-photo', { opacity: 0, x: 40, duration: 0.7 }, '-=0.5')
-    .from('section .max-w-360 > div > div', { opacity: 0, y: 20, duration: 0.6, stagger: 0.1 }, '-=0.3');
+  document.addEventListener('astro:page-load', () => {
+    if (!document.querySelector('.hero-letters')) return;
+    // On the first load, wait for the page curtain; after a page switch there is none.
+    const delay = firstLoad && !document.documentElement.dataset.introSeen ? 0.7 : 0.1;
+    firstLoad = false;
+
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' }, delay });
+
+    tl.from('.hero-letters', { opacity: 0, y: 60, duration: 0.9 })
+      .from('.hero-photo', { opacity: 0, x: 40, duration: 0.7 }, '-=0.5')
+      .from('section .max-w-360 > div > div', { opacity: 0, y: 20, duration: 0.6, stagger: 0.1 }, '-=0.3');
+  });
 </script>

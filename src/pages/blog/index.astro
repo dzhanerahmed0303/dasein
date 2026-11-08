@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import { Icon } from 'astro-icon/components';
 import Card from '../../components/Card.astro';
 import PageLayout from '../../layouts/PageLayout.astro';
 
@@ -15,6 +16,17 @@ const site = await getSite();
 
 <PageLayout title={site.title} description="Blog">
 	<section class="content-shell py-12 space-y-8">
+		{/* Shown only while src/content/blog/ has no posts; it disappears as soon as one is added. */}
+		{posts.length === 0 && (
+			<div class="flex flex-col items-center justify-center gap-3 border border-dashed border-[color:var(--color-border)] px-6 py-20 text-center">
+				<Icon name="tabler:pencil" size={28} class="text-[color:var(--color-muted)]" aria-hidden="true" />
+				<p class="text-sm font-bold uppercase tracking-wide text-[color:var(--color-ink)]">No blog posts yet</p>
+				<p class="max-w-md text-sm leading-relaxed text-[color:var(--color-muted)]">
+					There are no blog posts at the moment. New posts will show up here once they are published.
+				</p>
+			</div>
+		)}
+
 		{featured && (
 			<div class="grid grid-cols-1">
 				<Card

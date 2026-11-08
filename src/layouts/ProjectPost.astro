@@ -80,23 +80,26 @@ const { title, description, pubDate, updatedDate, heroImage, gallery = [], tags 
 </BaseLayout>
 
 <script>
-	const dialog = document.getElementById('lightbox') as HTMLDialogElement | null;
-	const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement | null;
+  // Module scripts run once; astro:page-load fires on the first load and after every page switch.
+  document.addEventListener('astro:page-load', () => {
+  	const dialog = document.getElementById('lightbox') as HTMLDialogElement | null;
+  	const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement | null;
 
-	if (dialog && lightboxImg) {
-		document.querySelectorAll('.post-hero-image img, .post-gallery-item img').forEach((el) => {
-			el.addEventListener('click', () => {
-				const source = el as HTMLImageElement;
-				lightboxImg.src = source.currentSrc || source.src;
-				lightboxImg.alt = source.alt;
-				dialog.showModal();
-			});
-		});
+  	if (dialog && lightboxImg) {
+  		document.querySelectorAll('.post-hero-image img, .post-gallery-item img').forEach((el) => {
+  			el.addEventListener('click', () => {
+  				const source = el as HTMLImageElement;
+  				lightboxImg.src = source.currentSrc || source.src;
+  				lightboxImg.alt = source.alt;
+  				dialog.showModal();
+  			});
+  		});
 
-		dialog.addEventListener('click', (e) => {
-			if (e.target === dialog) dialog.close();
-		});
+  		dialog.addEventListener('click', (e) => {
+  			if (e.target === dialog) dialog.close();
+  		});
 
-		dialog.querySelector('.lightbox-close')?.addEventListener('click', () => dialog.close());
-	}
+  		dialog.querySelector('.lightbox-close')?.addEventListener('click', () => dialog.close());
+  	}
+  });
 </script>

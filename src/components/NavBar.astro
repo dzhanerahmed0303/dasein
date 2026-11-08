@@ -1,0 +1,359 @@
+---
+import { Icon } from 'astro-icon/components';
+import { withBase } from '../utils/slugify';
+import ThemeToggle from './ThemeToggle.astro';
+
+interface Props {
+  class?: string;
+  sticky?: boolean;
+}
+
+const { class: className, sticky = true } = Astro.props;
+
+const navItems = [
+  { label: 'Home', href: '/', icon: 'tabler:home' },
+  { label: 'Blog', href: '/blog', icon: 'tabler:article' },
+  { label: 'Projects', href: '/projects', icon: 'tabler:code' },
+  { label: 'About', href: '/about', icon: 'tabler:user' },
+];
+
+const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isActive = (href: string) => {
+  const full = withBase(href).replace(/\/$/, '') || '/';
+  return href === '/' ? pathname === full : pathname === full || pathname.startsWith(`${full}/`);
+};
+---
+
+<header
+  class:list={['site-header', sticky && 'site-header--sticky']}
+  transition:persist="navbar"
+  transition:name="navbar"
+  transition:animate="none"
+>
+<nav aria-label="Main Navigation" class:list={['bottom-nav', className]}>
+  {
+    navItems.map((item) => {
+      const active = isActive(item.href);
+      return (
+        <a
+          href={withBase(item.href)}
+          data-nav-key={withBase(item.href)}
+          data-nav-exact={item.href === '/' ? '' : undefined}
+          class:list={['bottom-nav__item', active && 'is-active']}
+          aria-label={item.label}
+          aria-current={active ? 'page' : undefined}
+        >
+          <Icon name={item.icon} size={22} aria-hidden="true" />
+          <span class="bottom-nav__label"><span>{item.label}</span></span>
+        </a>
+      );
+    })
+  }
+  <span class="bottom-nav__divider" aria-hidden="true"></span>
+  <ThemeToggle class="bottom-nav__item bottom-nav__theme">
+    <Icon name="tabler:moon" size={25} class="bottom-nav__theme-moon" aria-hidden="true" />
+    <Icon name="tabler:sun" size={25} class="bottom-nav__theme-sun" aria-hidden="true" />
+  </ThemeToggle>
+</nav>
+
+<!-- Mobile (below 768px): hamburger button with a full-screen menu instead of the pill. -->
+<button
+  id="nav-toggle"
+  type="button"
+  aria-label="Open navigation"
+  aria-expanded="false"
+  aria-controls="mobile-nav"
+  class="burger md:hidden flex flex-col justify-center items-center w-10 h-10 gap-[6px] rounded-lg border border-transparent hover:border-[var(--color-border)] transition-colors"
+>
+  <span class="burger-line"></span>
+  <span class="burger-line"></span>
+  <span class="burger-line"></span>
+</button>
+
+<div
+  id="mobile-nav"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Mobile navigation"
+  hidden
+  class="mobile-nav fixed inset-0 z-[1000] flex flex-col justify-center px-10 py-12 bg-[var(--color-paper)] text-[var(--color-ink)]"
+>
+  <button id="mobile-close" type="button" aria-label="Close navigation" class="absolute right-6 top-6 w-12 h-12 flex items-center justify-center rounded-full border border-[var(--color-border)] text-sm font-bold uppercase">✕</button>
+  <nav class="flex flex-col gap-8" aria-label="Mobile navigation links">
+    {
+      navItems.map((item) => {
+        const active = isActive(item.href);
+        return (
+          <a
+            href={withBase(item.href)}
+            data-nav-key={withBase(item.href)}
+            data-nav-exact={item.href === '/' ? '' : undefined}
+            class:list={['mobile-nav__link text-4xl font-extrabold uppercase tracking-tight', active && 'is-active']}
+            aria-current={active ? 'page' : undefined}
+          >
+            {item.label}
+          </a>
+        );
+      })
+    }
+  </nav>
+  <div class="mt-10">
+    <ThemeToggle class="text-sm font-bold uppercase" />
+  </div>
+</div>
+</header>
+
+<!--
+  The header is kept on screen across page switches (transition:persist), so this runs once.
+  The pill moves the moment a link is clicked, and is re-checked after every switch
+  (also for back/forward), which gives one continuous animation.
+-->
+<script>
+  import { gsap } from 'gsap';
+
+  const normalize = (path: string) => path.replace(/\/$/, '') || '/';
+
+  // Marks the current page in both the pill and the mobile menu.
+  const setActive = (path: string) => {
+    const current = normalize(path);
+    document.querySelectorAll<HTMLAnchorElement>('.site-header a[data-nav-key]').forEach((link) => {
+      const key = normalize(link.dataset.navKey ?? '');
+      const on = link.hasAttribute('data-nav-exact')
+        ? current === key
+        : current === key || current.startsWith(`${key}/`);
+      link.classList.toggle('is-active', on);
+      if (on) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    });
+  };
+
+  document.addEventListener('click', (event) => {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
+    if (!(link instanceof HTMLAnchorElement) || link.origin !== location.origin || link.target) return;
+    setActive(link.pathname);
+  });
+
+  document.addEventListener('astro:page-load', () => setActive(location.pathname));
+
+  // ---------- Mobile menu ----------
+  const burger = document.getElementById('nav-toggle');
+  const menu = document.getElementById('mobile-nav');
+  const closeButton = document.getElementById('mobile-close');
+
+  if (burger && menu) {
+    // Burger lines morph into an X while the menu is open.
+    const lines = Array.from(burger.querySelectorAll('.burger-line'));
+    const burgerTl = gsap.timeline({ paused: true });
+    burgerTl
+      .to(lines[0], { y: 8, duration: 0.2, ease: 'power2.inOut' })
+      .to(lines[2], { y: -8, duration: 0.2, ease: 'power2.inOut' }, '<')
+      .to(lines[1], { scaleX: 0, opacity: 0, duration: 0.15, ease: 'power2.in' }, '<')
+      .to(lines[0], { rotation: 45, duration: 0.28, ease: 'expo.out' })
+      .to(lines[2], { rotation: -45, duration: 0.28, ease: 'expo.out' }, '<');
+
+    const setMenu = (open: boolean) => {
+      if (open === !menu.hidden) return;
+      menu.hidden = !open;
+      burger.setAttribute('aria-expanded', String(open));
+      burger.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+      document.body.style.overflow = open ? 'hidden' : '';
+      if (open) {
+        burgerTl.play();
+        menu.querySelector<HTMLElement>('a, button')?.focus();
+      } else {
+        burgerTl.reverse();
+        if (menu.contains(document.activeElement)) burger.focus();
+      }
+    };
+
+    burger.addEventListener('click', () => setMenu(menu.hidden !== false));
+    closeButton?.addEventListener('click', () => setMenu(false));
+    // Picking a page closes the menu; the page switch then happens underneath.
+    menu.addEventListener('click', (event) => {
+      if (event.target instanceof Element && event.target.closest('a')) setMenu(false);
+    });
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') setMenu(false);
+    });
+    // Close when the screen becomes wide enough for the pill.
+    window.matchMedia('(min-width: 768px)').addEventListener('change', (event) => {
+      if (event.matches) setMenu(false);
+    });
+  }
+</script>
+
+<!-- Global because the theme button is rendered inside ThemeToggle, outside this component's scope. -->
+<style is:global>
+  .bottom-nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: fit-content;
+    max-width: 95vw;
+    /* Same space on all four sides at every screen size; height follows from the 40px items. */
+    padding: 6px;
+    border: 1px solid var(--color-border);
+    border-radius: 9999px;
+    background: var(--color-surface);
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    /* Delayed so the intro is visible once the page curtain has slid away. */
+    animation: bottom-nav-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 1.55s both;
+  }
+
+  /* Top-right, where the old header used to be. Clicks pass through the empty part of the row. */
+  .site-header {
+    display: flex;
+    justify-content: flex-end;
+    padding: 1rem calc(var(--grid-cell) / 2);
+    pointer-events: none;
+    z-index: 50;
+  }
+
+  .site-header > * {
+    pointer-events: auto;
+  }
+
+  /* Mobile: the hamburger menu replaces the pill (same 768px breakpoint as Tailwind's md:). */
+  @media (max-width: 767.98px) {
+    .site-header {
+      padding-inline: var(--grid-cell);
+    }
+
+    .site-header > .bottom-nav {
+      display: none;
+    }
+  }
+
+  .mobile-nav[hidden] {
+    display: none;
+  }
+
+  .mobile-nav__link.is-active {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .burger-line {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--color-ink);
+    border-radius: 2px;
+    transform-origin: center;
+  }
+
+  .site-header--sticky {
+    position: sticky;
+    top: 0;
+  }
+
+  /* After the first page open: stay above the page curtain and don't replay the intro. */
+  html[data-intro-seen] .site-header {
+    z-index: 9999;
+  }
+
+  html[data-intro-seen] .bottom-nav {
+    animation: none;
+  }
+
+  .bottom-nav__divider {
+    width: 1px;
+    height: 24px;
+    margin-inline: 0.25rem;
+    background: var(--color-border);
+  }
+
+  .bottom-nav__theme {
+    cursor: pointer;
+  }
+
+  .bottom-nav__theme-sun,
+  html[data-theme='dark'] .bottom-nav__theme-moon {
+    display: none;
+  }
+
+  html[data-theme='dark'] .bottom-nav__theme-sun {
+    display: block;
+  }
+
+  .bottom-nav__item {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    min-width: 44px;
+    padding: 0.5rem 0.75rem;
+    border-radius: 9999px;
+    color: var(--color-muted);
+    transition: background-color 0.2s, color 0.2s, transform 0.1s;
+  }
+
+  .bottom-nav__item:hover {
+    background: color-mix(in oklab, var(--color-ink) 6%, transparent);
+  }
+
+  .bottom-nav__item:active {
+    transform: scale(0.97);
+  }
+
+  .bottom-nav__item:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .bottom-nav__item.is-active {
+    color: var(--color-ink);
+    background: color-mix(in oklab, var(--color-ink) 10%, transparent);
+  }
+
+  /*
+    Every label opens to the same fixed width, so the navbar is always equally wide.
+    The closing and opening label share one duration and curve, so their widths add up
+    to the same total at every moment of the switch.
+  */
+  .bottom-nav__label {
+    display: block;
+    width: 0;
+    flex-shrink: 0;
+    overflow: hidden;
+    margin-left: 0;
+    opacity: 0;
+    white-space: nowrap;
+    font-size: clamp(0.625rem, 0.5263rem + 0.5263vw, 1rem);
+    font-weight: 500;
+    line-height: 1.9;
+    user-select: none;
+    transition:
+      width 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+      margin-left 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.3s ease;
+  }
+
+  /* Full width at all times; the outer box reveals it, so the text never squashes while sliding. */
+  .bottom-nav__label > span {
+    display: block;
+    width: 4.6em;
+  }
+
+  .is-active .bottom-nav__label {
+    /* Fits the longest label ("Projects"); scales with the label's font size. */
+    width: 4.6em;
+    margin-left: 8px;
+    opacity: 1;
+    transition-delay: 0s, 0s, 0.2s;
+  }
+
+  @keyframes bottom-nav-in {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bottom-nav,
+    .bottom-nav__label {
+      animation: none;
+      transition: none;
+    }
+  }
+</style>
+

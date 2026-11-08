@@ -72,7 +72,10 @@ import PageLayout from '../layouts/PageLayout.astro';
   </section>
 </PageLayout>
 
-<script is:inline>
+<script is:inline data-astro-rerun>
+  // data-astro-rerun: hook up the form again on every visit, not just the first.
+  // Wrapped so its consts can be declared again on each run.
+  (() => {
   const form = document.getElementById('contact-form');
   if (form) {
     form.addEventListener('submit', function (e) {
@@ -85,4 +88,5 @@ import PageLayout from '../layouts/PageLayout.astro';
       window.location.href = 'mailto:dzhaner.shener@outlook.com?subject=' + subject + '&body=' + body;
     });
   }
+  })();
 </script>

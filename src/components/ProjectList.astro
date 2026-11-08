@@ -1,5 +1,6 @@
 ---
 import Card from "./Card.astro";
+import { Icon } from 'astro-icon/components';
 import { getCollection } from 'astro:content';
 import { withBase } from '../utils/slugify';
 
@@ -49,14 +50,19 @@ const baseUrl =
                             description={project.data.description}
                             image={project.data.heroImage}
                             imageAlt={project.data.title}
+                            tags={project.data.tags}
                         />
                     </div>
                 ))}
-                <div data-reveal style={`transition-delay:${visibleItems.length * 100}ms`}>
-                    <Card
-                        title={viewAllLabel}
+                <!-- Same size and padding as a card's image, so it lines up with the other tiles. -->
+                <div data-reveal class="p-5" style={`transition-delay:${visibleItems.length * 100}ms`}>
+                    <a
                         href={`${baseUrl}${viewAllHref}`}
-                    />
+                        class="group flex aspect-12/7 w-full items-center justify-center gap-2 border border-dashed border-[color:var(--color-border)] text-sm font-bold uppercase tracking-wide transition-colors duration-300 hover:border-[color:var(--color-accent)] hover:text-[color:var(--color-accent)]"
+                    >
+                        {viewAllLabel}
+                        <Icon name="tabler:arrow-right" size={18} class="transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true" />
+                    </a>
                 </div>
             </div>
         </div>

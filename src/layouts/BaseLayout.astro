@@ -2,7 +2,8 @@
 import type { ImageMetadata } from 'astro';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
+import NavBar from '../components/NavBar.astro';
+import { ClientRouter } from 'astro:transitions';
 import { getSite } from '../utils/consts';
 
 interface Props {
@@ -19,11 +20,33 @@ const { title = site.author.name, description, image } = Astro.props;
 <html lang="en">
     <head>
         <BaseHead title={title ?? ''} description={description ?? ''} image={image} />
+        <!-- Page switches happen in place, so the navbar stays on screen (see NavBar.astro). -->
+        <ClientRouter />
+        <!--
+          Head scripts run once per full page load, not on in-place page switches.
+          - The curtain and navbar intro only play on the first visit in this tab.
+          - On each page switch the new page's <html> replaces the current one, so carry
+            the theme and the "intro seen" flag over, and drop the new page's curtain.
+        -->
+        <script is:inline>
+          try {
+            if (sessionStorage.getItem('intro-seen')) document.documentElement.dataset.introSeen = 'true';
+            else sessionStorage.setItem('intro-seen', '1');
+          } catch {}
+
+          document.addEventListener('astro:before-swap', (event) => {
+            const html = event.newDocument.documentElement;
+            html.dataset.introSeen = 'true';
+            const theme = document.documentElement.dataset.theme;
+            if (theme) html.dataset.theme = theme;
+            event.newDocument.getElementById('page-curtain')?.remove();
+          });
+        </script>
     </head>
     <body>
         <div id="page-curtain" aria-hidden="true" style="position:fixed;inset:0;z-index:9998;background:#0d0d10;pointer-events:none;will-change:transform;"></div>
-        <div style="position: relative; z-index: 1; display: flex; flex-direction: column; min-height: 100vh;">
-            <Header />
+        <NavBar />
+        <div style="position: relative; z-index: 1; display: flex; flex-direction: column; flex: 1;">
             <main class="content-shell">
                 <slot />
             </main>
@@ -35,8 +58,11 @@ const { title = site.author.name, description, image } = Astro.props;
 <script>
   import { gsap } from 'gsap';
 
+  // Module scripts run once, on the full page load. Later page switches never get a curtain.
   const curtain = document.getElementById('page-curtain');
-  if (curtain) {
+  if (curtain && document.documentElement.dataset.introSeen) {
+    curtain.remove();
+  } else if (curtain) {
     gsap.to(curtain, {
       yPercent: -100,
       duration: 0.85,
@@ -47,15 +73,22 @@ const { title = site.author.name, description, image } = Astro.props;
   }
 </script>
 
-<script is:inline>
-  const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('revealed');
-        revealObserver.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.12 });
+<!--
+  data-astro-rerun: run after every page switch. Without it, Astro runs a script that is the same
+  on every page only once, and [data-reveal] items (like the projects on Home) stay invisible.
+  Wrapped so its consts can be declared again on each run.
+-->
+<script is:inline data-astro-rerun>
+  (() => {
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
 
-  document.querySelectorAll('[data-reveal]').forEach((el) => revealObserver.observe(el));
+    document.querySelectorAll('[data-reveal]').forEach((el) => revealObserver.observe(el));
+  })();
 </script>

@@ -17,6 +17,9 @@
   :root {
     color-scheme: light;
     background-color: var(--color-paper);
+    /* Always reserve the scrollbar's space, so the right-aligned navbar doesn't jump
+       sideways when a page's scrollbar appears or disappears while it loads. */
+    scrollbar-gutter: stable;
     --grid-divisions: 20;
     --grid-cell: calc(100vw / var(--grid-divisions));
     --grid-cell-x: var(--grid-cell);
@@ -29,6 +32,9 @@
     :root {
       --grid-divisions: 24;
       --content-columns: 23;
+      /* Scale all rem-based sizes with the viewport so large screens look like
+         the 1536px layout, just bigger (16px at 1536px). */
+      font-size: calc(100vw / 96);
     }
   }
 
@@ -42,6 +48,11 @@
     --grid-line: color-mix(in oklab, var(--color-ink) 10%, transparent);
     --grid-line-bg: color-mix(in oklab, var(--color-ink) 5%, transparent);
   }
+  /* The page curtain only plays on the first visit in a tab (flag set in BaseLayout). */
+  :root[data-intro-seen] #page-curtain {
+    display: none;
+  }
+
   *,
   *::before,
   *::after {
@@ -149,23 +160,6 @@
     border: 1px solid var(--color-border);
     border-radius: 28px;
     background: var(--color-surface);
-  }
-
-  .site-header {
-    height: calc(var(--grid-cell) / 2);
-    min-height: calc(var(--grid-cell) / 2);
-    display: flex;
-    align-items: center;
-    padding-left: calc(var(--grid-cell) / 2);
-    padding-right: calc(var(--grid-cell) / 2);
-  }
-
-  @media (max-width: 720px) {
-    .site-header {
-      min-height: calc(var(--grid-cell) * 2);
-      padding-left: calc(var(--grid-cell) / 1);
-      padding-right: calc(var(--grid-cell) / 1);
-    }
   }
 
   .hero {
@@ -425,37 +419,6 @@
     transform: translateY(0);
   }
 
-  /* Burger menu button */
-  .burger-line {
-    display: block;
-    width: 22px;
-    height: 2px;
-    background: var(--color-ink);
-    border-radius: 2px;
-    transform-origin: center;
-  }
-
-
-  /* Nav sliding underline */
-  .nav-link {
-    position: relative;
-    padding-bottom: 2px;
-  }
-  .nav-link::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: var(--color-accent);
-    transition: width 250ms ease;
-  }
-  .nav-link:hover::after,
-  .nav-link.active::after {
-    width: 100%;
-  }
-
   /* Social pill lift + glow */
   .social-pill {
     transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
@@ -495,4 +458,29 @@
     width: 100%;
     left: 0;
   }
+}
+
+/* Hero character: on small screens it sits above the title, so its cut-off bottom fades out.
+   From lg up it stands on the line above the hero info row and keeps a hard edge. */
+@media (max-width: 1023.98px) {
+  .hero-photo {
+    -webkit-mask-image: linear-gradient(to bottom, #000 75%, transparent);
+    mask-image: linear-gradient(to bottom, #000 75%, transparent);
+  }
+}
+
+/* From lg up: line the end of the sweater up with the end of the line under it. That line sits in
+   a max-w-360 (90rem) container with px-8 (2rem); the sweater stops 2.9% before the image's right
+   edge (932 of 960 px in the front pose), so the image may stick out by that much. */
+@media (min-width: 1024px) {
+  .hero-photo {
+    --hero-photo-w: 24rem;
+    margin-right: calc(max(2rem, (100% - 90rem) / 2 + 2rem) - var(--hero-photo-w) * 0.029);
+  }
+}
+@media (min-width: 1280px) {
+  .hero-photo { --hero-photo-w: 28rem; }
+}
+@media (min-width: 1536px) {
+  .hero-photo { --hero-photo-w: 34rem; }
 }

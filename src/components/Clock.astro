@@ -33,7 +33,13 @@ const initialTime = new Intl.DateTimeFormat(locale, {
 </span>
 
 <script>
-	const clocks = document.querySelectorAll('.clock');
+	// Module scripts run once; astro:page-load fires on the first load and after every page switch.
+	let timers: ReturnType<typeof setInterval>[] = [];
+
+	document.addEventListener('astro:page-load', () => {
+	timers.forEach(clearInterval);
+	timers = [];
+	const clocks = document.querySelectorAll<HTMLElement>('.clock');
 
 	const formatTime = (date, { locale, timeZone, hour12, showSeconds }) => {
 		const options = {
@@ -64,6 +70,7 @@ const initialTime = new Intl.DateTimeFormat(locale, {
 
 		update();
 		const intervalMs = showSeconds ? 1000 : 60_000;
-		setInterval(update, intervalMs);
+		timers.push(setInterval(update, intervalMs));
+	});
 	});
 </script>
