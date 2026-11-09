@@ -49,9 +49,8 @@ if (posts.length === 0) {
     console.warn(
         '[PostList] No posts provided; fetching from "blog" collection.'
     );
-    posts = posts.concat(await getCollection("blog")).sort(
-        (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-    );
+    const time = (post: RawPost) => new Date(getPostData(post)?.pubDate ?? 0).valueOf();
+    posts = posts.concat(await getCollection("blog")).sort((a, b) => time(b) - time(a));
 }
 
 const subpath = import.meta.env.BASE_URL;
@@ -97,12 +96,12 @@ const visiblePosts = typeof limit === "number" ? posts.slice(0, limit) : posts;
                         return (
                             <div data-reveal style={`transition-delay:${visiblePosts.indexOf(post) * 100}ms`}>
                                 <Card
-                                    title={p.title}
-                                    href={href}
+                                    title={p.title ?? ""}
+                                    href={href ?? withBase("/blog/")}
                                     image={p.heroImage}
                                     imageAlt={p.title}
                                     description={p.description}
-                                    date={pubDate}
+                                    date={pubDate ?? undefined}
                                 />
                             </div>
                         );

@@ -41,8 +41,11 @@ const initialTime = new Intl.DateTimeFormat(locale, {
 	timers = [];
 	const clocks = document.querySelectorAll<HTMLElement>('.clock');
 
-	const formatTime = (date, { locale, timeZone, hour12, showSeconds }) => {
-		const options = {
+	const formatTime = (
+		date: Date,
+		{ locale, timeZone, hour12, showSeconds }: { locale: string; timeZone: string; hour12: boolean; showSeconds: boolean },
+	) => {
+		const options: Intl.DateTimeFormatOptions = {
 			timeZone,
 			hour: '2-digit',
 			minute: '2-digit',

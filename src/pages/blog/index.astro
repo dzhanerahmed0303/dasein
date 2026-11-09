@@ -14,7 +14,7 @@ const [featured, ...rest] = posts;
 const site = await getSite();
 ---
 
-<PageLayout title={site.title} description="Blog">
+<PageLayout title={`Blog · ${site.title}`} description="Thoughts, notes and write-ups.">
 	<section class="content-shell py-12 space-y-8">
 		{/* Shown only while src/content/blog/ has no posts; it disappears as soon as one is added. */}
 		{posts.length === 0 && (
@@ -36,7 +36,6 @@ const site = await getSite();
 					date={featured.data.pubDate}
 					image={featured.data.heroImage}
 					imageAlt={featured.data.title}
-					variant="post"
 				>
 					{featured.data.tags.length > 0 && (
 						<div class="flex flex-wrap gap-2 pt-1 text-sm text-muted">
@@ -61,7 +60,6 @@ const site = await getSite();
 						date={post.data.pubDate}
 						image={post.data.heroImage}
 						imageAlt={post.data.title}
-						variant="post"
 					>
 						{post.data.tags.length > 0 && (
 							<div class="flex flex-wrap gap-2 pt-1 text-sm text-muted">

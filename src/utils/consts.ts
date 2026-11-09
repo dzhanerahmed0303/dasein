@@ -8,6 +8,8 @@ export async function getSite() {
 	const author = await getEntry('site', 'author');
 	const social = await getEntry('site', 'social');
 	return {
+		// Site name, used in page titles (e.g. "Projects · Dzhaner Shener").
+		title: (author?.data?.name as string | undefined) ?? 'Dzhaner Shener',
 		author: author?.data,
 		social: social?.data,
 	};
